@@ -28,7 +28,7 @@ public class Transaction {
     private String reference;
 
     @Column( name = "transaction_status", nullable = false)
-    private String status;
+    private Boolean status;
 
     @Column( name = "transaction_created", nullable = false)
     private Date created;
@@ -36,4 +36,14 @@ public class Transaction {
     @Column( name = "transaction_amount", nullable = false)
     private BigDecimal amount;
 
+    @Column( name = "transaction_senderId", nullable = true)
+    private Long senderId;
+
+    @Column( name = "transaction_receivedId", nullable = true)
+    private Long receivedId;
+
 }
+/**
+ * senderId et receivedId vont permettr d'identifier l'utilisateur
+ * qui a effectuer la transction
+ */

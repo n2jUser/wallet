@@ -17,7 +17,6 @@ public class TransactionRequest {
 
     private String code;
     private String reference;
-    private String status;
     private Date created;
     private BigDecimal amount;
 }

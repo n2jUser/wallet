@@ -12,7 +12,7 @@ public class WalletServiceApplication {
 
 }
 
-// une methode qui retourne un utilisateur a partir de userId
-// on recupere son montant
-// on recupere le wallet de celui qui envoie
-// le wallet de celui qui recoit
+// recuperer toutes les trasaction
+// recupere toutes les trasaction avec le status completed
+// rcuperer les transaction en fonction du code
+// recuperer un trasction en fonction de l'id

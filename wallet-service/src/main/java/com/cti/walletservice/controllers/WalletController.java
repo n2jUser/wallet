@@ -1,7 +1,5 @@
 package com.cti.walletservice.controllers;
 
-import com.cti.walletservice.dto.TransactionReponse;
-import com.cti.walletservice.dto.TransactionRequest;
 import com.cti.walletservice.dto.WalletReponse;
 import com.cti.walletservice.dto.WalletRequest;
 import com.cti.walletservice.models.Wallet;
@@ -9,6 +7,7 @@ import com.cti.walletservice.services.TransactionService;
 import com.cti.walletservice.services.WalletService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,18 +26,48 @@ public class WalletController {
 
 
     @PostMapping("/create")
-    @ResponseStatus(value = HttpStatus.CREATED) // Affiche le status de la requette
-    public WalletReponse createdwallet(@RequestBody WalletRequest wallet){
-        return walletServices.createWallet(wallet);
+    public ResponseEntity<WalletReponse>  createdwallet(@RequestBody WalletRequest walletRequest){
+        return walletServices.createWallet (walletRequest);
+
+    }
+    @PostMapping("/activate/{userId}")
+    public ResponseEntity<WalletReponse>  activateWallet(@PathVariable Long userId){
+        return walletServices.activateWallet (userId);
+
+    }
+
+    @PostMapping("/disable/{userId}")
+    public ResponseEntity<WalletReponse>  disableteWallet(@PathVariable Long userId){
+        return walletServices.disableWallet (userId);
+
+    }
+
+    @GetMapping("/find/Id/{Id}")
+    public ResponseEntity<WalletReponse> findById(@PathVariable Long Id){
+        return walletServices.findById(Id);
+
+    }
+
+    @GetMapping("/find/UserId/{Id}")
+    public ResponseEntity<WalletReponse> findByUserId(@PathVariable Long Id){
+        return walletServices.findByUserId(Id);
 
     }
 
     @GetMapping("/all")
-    @ResponseStatus(value = HttpStatus.OK)  // afficher le status de la requette
-    public List<Wallet> getWalletts(){
-        System.out.println("getting all wallets");
-        return walletServices.getWallets();
+    public ResponseEntity<List<Wallet>> getWalletts(){
+        return walletServices.getAllWallets();
     }
+
+
+
+
+
+
+
+
+
+
 
     @GetMapping("/find/id/{id}")
     public Optional<Wallet> getWalletById(@PathVariable Long id){
@@ -54,17 +83,7 @@ public class WalletController {
 
     }
 
-    @PutMapping("/update/send/{walletUserId}")
-    public Wallet createdSendTransaction(@RequestBody TransactionRequest transaction, @PathVariable Long walletUserId){
-        return  transactionService.walletSendTransaction (transaction, walletUserId);
 
-    }
-
-    @PutMapping("/update/receive/{walletUserId}")
-    public Wallet createdReceiveTransaction(@RequestBody TransactionRequest transaction, @PathVariable Long walletUserId){
-        return  transactionService.walletReceiveTransaction (transaction, walletUserId);
-
-    }
 
     @PutMapping("/update")
     public  Wallet updateWallet(@RequestBody WalletRequest walletRequest){

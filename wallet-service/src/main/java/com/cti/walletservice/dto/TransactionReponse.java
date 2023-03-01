@@ -18,7 +18,10 @@ public class TransactionReponse {
     private Long id;
     private String code;
     private String reference;
-    private String status;
+    private Boolean status;
     private Date created;
     private BigDecimal amount;
+    private String message;
+    private Long senderId;
+    private Long receiveId;
 }

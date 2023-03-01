@@ -13,9 +13,15 @@ import java.math.BigDecimal;
 @Builder
 public class WalletReponse {
 
-    private Long id;
-    private String code;
-    private Boolean isBlocked;
-    private BigDecimal balance;
-    private Long userId;
+    private Long id = null;
+
+    private String code = "";
+
+    private Boolean isActive = false;
+
+    private BigDecimal balance = BigDecimal.valueOf(0);
+
+    private Long userId = null;
+
+    private String message = "";
 }
