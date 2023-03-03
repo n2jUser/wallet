@@ -90,19 +90,24 @@ public class WalletService {
 
         if (wallet != null){
             if (wallet.getId() != null){
-                wallet.setIsActive(true);
+                if(wallet.getIsActive()){
+                    throw new WalletBadRequestException(" This wallet was already activated");
 
-                Wallet wallet1 = walletRepository.save(wallet);
-                WalletReponse walletReponse = WalletReponse.builder()
-                        .id(wallet1.getId())
-                        .code(wallet1.getCode())
-                        .isActive(wallet1.getIsActive())
-                        .message("Success")
-                        .balance(wallet1.getBalance())
-                        .userId(wallet1.getUserId())
-                        .build();
+                }else{
+                    wallet.setIsActive(true);
 
-                return new ResponseEntity<>(walletReponse, HttpStatus.OK);
+                    Wallet wallet1 = walletRepository.save(wallet);
+                    WalletReponse walletReponse = WalletReponse.builder()
+                            .id(wallet1.getId())
+                            .code(wallet1.getCode())
+                            .isActive(wallet1.getIsActive())
+                            .message("Success")
+                            .balance(wallet1.getBalance())
+                            .userId(wallet1.getUserId())
+                            .build();
+
+                    return new ResponseEntity<>(walletReponse, HttpStatus.OK);
+                }
             }else{
                 throw new WalletBadRequestException("Wallet with that userId doesn't exist");
             }
@@ -122,32 +127,34 @@ public class WalletService {
 
         if (wallet != null){
             if (wallet.getId() != null){
-                wallet.setIsActive(false);
+                if(wallet.getIsActive()){
+                    wallet.setIsActive(false);
 
-                Wallet wallet1 = walletRepository.save(wallet);
-                WalletReponse walletReponse = WalletReponse.builder()
-                        .id(wallet1.getId())
-                        .code(wallet1.getCode())
-                        .isActive(wallet1.getIsActive())
-                        .message("Success")
-                        .balance(wallet1.getBalance())
-                        .userId(wallet1.getUserId())
-                        .build();
+                    Wallet wallet1 = walletRepository.save(wallet);
+                    WalletReponse walletReponse = WalletReponse.builder()
+                            .id(wallet1.getId())
+                            .code(wallet1.getCode())
+                            .isActive(wallet1.getIsActive())
+                            .message("Success")
+                            .balance(wallet1.getBalance())
+                            .userId(wallet1.getUserId())
+                            .build();
 
-                return new ResponseEntity<>(walletReponse, HttpStatus.OK);
+                    return new ResponseEntity<>(walletReponse, HttpStatus.OK);
+
+                }else{
+                    throw new WalletBadRequestException(" This wallet was already activated");
+                }
             }else{
                 throw new WalletBadRequestException("Wallet with that userId doesn't exist");
             }
-
         }else{
             throw new WalletBadRequestException("Wallet with that userId doesn't exist");
         }
-
-
     }
 
 
-    public ResponseEntity<WalletReponse> findById(Long id){
+    public ResponseEntity<WalletReponse> findWalletById(Long id){
         Wallet wallet = walletRepository.findById(id).orElseThrow(()-> new WalletNofoundException(id));
         WalletReponse walletReponse = WalletReponse.builder()
                 .id(wallet.getId())
@@ -157,10 +164,10 @@ public class WalletService {
                 .balance(wallet.getBalance())
                 .userId(wallet.getUserId())
                 .build();
-
         return new ResponseEntity<>(walletReponse, HttpStatus.OK);
 
     }
+
 
     public ResponseEntity<WalletReponse> findByUserId(Long id){
         Wallet wallet = walletRepository.findByUserId(id);
@@ -173,7 +180,6 @@ public class WalletService {
                     .balance(wallet.getBalance())
                     .userId(wallet.getUserId())
                     .build();
-
             return new ResponseEntity<>(walletReponse, HttpStatus.OK);
         }else{
             throw new WalletBadRequestException("Wallet doesn't exist");
@@ -181,16 +187,174 @@ public class WalletService {
 
     }
 
+
     public ResponseEntity<List<Wallet>> getAllWallets(){
 
         List<Wallet> wallets = walletRepository.findAll().stream().toList();
-        return new ResponseEntity<>(wallets, HttpStatus.OK);
+        if (wallets != null){
+            return new ResponseEntity<>(wallets, HttpStatus.OK);
+        }else{
+            throw new WalletBadRequestException("The request about Wallet list have some problems");
+        }
+    }
 
+
+    public ResponseEntity<Optional<Wallet>> getWalletById(Long id){
+        Wallet wallet = walletRepository.findById(id).orElseThrow(()-> new WalletNofoundException(id));
+        return new ResponseEntity<>(Optional.of(wallet), HttpStatus.OK);
+    }
+
+
+    public ResponseEntity<WalletReponse> findWalletByCode(String code){
+        Wallet wallet = walletRepository.findByCode(code);
+        if(wallet != null){
+            WalletReponse walletReponse = WalletReponse.builder()
+                    .id(wallet.getId())
+                    .code(wallet.getCode())
+                    .isActive(wallet.getIsActive())
+                    .message("Success")
+                    .balance(wallet.getBalance())
+                    .userId(wallet.getUserId())
+                    .build();
+            return new ResponseEntity<>(walletReponse, HttpStatus.OK);
+        }else {
+
+        }
+        throw new WalletBadRequestException("Wallet doesn't exist");
+    }
+
+
+    public Wallet getWalletByCode(String code){
+        Wallet wallet = walletRepository.findByCode(code);
+        if (wallet != null){
+            return wallet;
+        }else{
+            throw new WalletBadRequestException("This wallet code doesn't have wallet");
+        }
+    }
+
+
+    // Faire une precision sur les champs qu'on peut modifier lors d'un update
+    public  ResponseEntity<WalletReponse> updateWallet(WalletRequest walletRequest){
+        Wallet wallet1 = getWalletByCode(walletRequest.getCode());
+        if (wallet1 != null){
+            if (wallet1.getId() != null){
+                Wallet wallet2 = null;
+                wallet2 = Wallet.builder()
+                            .id(wallet1.getId())
+                            .code(walletRequest.getCode())
+                            .isActive(wallet1.getIsActive())
+                            .balance(wallet1.getBalance())
+                            .userId(wallet1.getUserId())
+                            .build();
+                Wallet wallet3 = walletRepository.save(wallet2);
+                if (wallet3 != null){
+                    WalletReponse walletReponse = WalletReponse.builder()
+                                .id(wallet3.getId())
+                                .code(wallet3.getCode())
+                                .isActive(wallet3.getIsActive())
+                                .message("Successfully updated")
+                                .balance(wallet3.getBalance())
+                                .userId(wallet3.getUserId())
+                                .build();
+                    return new ResponseEntity<>(walletReponse, HttpStatus.OK);
+
+                }else {
+                    throw new WalletBadRequestException("Wallet doesn't Update");
+                    }
+            }else{
+                throw  new WalletBadRequestException("This wallet doesn't have the id");
+            }
+
+        }else {
+            throw  new WalletBadRequestException("This wallet doesn't have the id");
+        }
+    }
+
+
+    public ResponseEntity<WalletReponse> deleteWalletByCode(String code){
+
+        System.out.println("delete****************************************************************************************************************************** = "+ code);
+        Wallet wallet = getWalletByCode(code);
+        if (wallet != null){
+            Boolean delete = walletRepository.deleteByCode(code);
+            if (!delete) {
+                WalletReponse walletReponse = WalletReponse.builder()
+                        .id(wallet.getId())
+                        .code(wallet.getCode())
+                        .isActive(wallet.getIsActive())
+                        .message("Successfully deleted")
+                        .balance(wallet.getBalance())
+                        .userId(wallet.getUserId())
+                        .build();
+                return new ResponseEntity<>(walletReponse, HttpStatus.OK);
+            }else{
+                throw new WalletBadRequestException("Wallet doesn't delete");
+            }
+        }else{
+            throw  new WalletBadRequestException("This wallet doesn't exist");
+        }
     }
 
 
 
-    // Logger logger; permet d'afficher dans la console
+
+
+
+
+
+
+
+
+
+
+
+    public Wallet getWalletByUserId(Long userId){
+        Wallet wallet = walletRepository.findByUserId(userId);
+        return wallet;
+
+    }
+
+    public Wallet recharge(Wallet wallet, BigDecimal amount){
+
+        Boolean isValid = validateWallet.ValidateWallet(wallet);
+        if(isValid){
+            BigDecimal balance = amount.add(wallet.getBalance());
+            wallet.setBalance(balance);
+        }else {
+            throw new WalletBadRequestException("Wallet are blocking");
+        }
+        return  wallet;
+    }
+
+    public Wallet retrait (Wallet wallet, BigDecimal amount){
+        Boolean isValid = validateWallet.ValidateWallet(wallet);
+        if(isValid){
+            BigDecimal balance = wallet.getBalance();
+            if (balance.compareTo(amount) > 0){
+                BigDecimal balance1 = balance.subtract(amount);
+                wallet.setBalance(balance1);
+            }else{
+                throw new WalletBadRequestException("your balance is insufficient");
+            }
+        }else {
+            throw new WalletBadRequestException("Wallet are blocking");
+        }
+
+        return  wallet;
+
+    }
+
+// ecrire la methode
+//         walletRepository.findById(id).orElseThrow(()-> new WalletNofoundException(id))
+    // pour retourner une exception si on ne trouve pas le id
+
+
+}
+
+
+
+// Logger logger; permet d'afficher dans la console
 //    public WalletReponse createWallet (WalletRequest wallet){
 //        WalletRequest wallet1 = WalletRequest.builder() // construction du wallet sans id
 //                .code(wallet.getCode())
@@ -224,69 +388,4 @@ public class WalletService {
 //        return wallet;
 //    }
 
-    // returne un ou un false wallet par son id
-    public Optional<Wallet> getWalletById(Long id){
-        return Optional.of(walletRepository.findById(id).get());
-    }
-
-    public Wallet getwalletByCode(String code){
-        Wallet wallet = walletRepository.findByCode(code);
-        return wallet;
-    }
-    public  Wallet updateWallet(WalletRequest wallet){
-        Optional<Wallet> wallet1 = Optional.ofNullable(getwalletByCode(wallet.getCode()));
-        Wallet wallet2 = null;
-        if(wallet1.get().getId() != null){
-            wallet2 = Wallet.builder()
-                    .id(wallet1.get().getId())
-                    .code(wallet.getCode())
-                    .isActive(wallet.getIsActive())
-                    .balance(wallet.getBalance())
-                    .userId(wallet.getUserId())
-                    .build();
-            walletRepository.save(wallet2);
-        }
-
-        return wallet2;
-    }
-    public List<Wallet> deleteWalletById(Long id){
-        walletRepository.deleteById(id);
-        List<Wallet> wallets= (List<Wallet>) getAllWallets();
-        return wallets;
-    }
-
-    public Wallet getWalletByUserId(Long userId){
-        Wallet wallet = walletRepository.findByUserId(userId);
-        return wallet;
-
-    }
-
-    public Wallet Recharge(Wallet wallet, BigDecimal amount){
-
-        Boolean isValid = validateWallet.ValidateWallet(wallet);
-        if(isValid){
-            BigDecimal balance = amount.add(wallet.getBalance());
-            wallet.setBalance(balance);
-            walletRepository.save(wallet);
-        }
-        return  wallet;
-    }
-
-    public Wallet Retrait(Wallet wallet, BigDecimal amount){
-        Boolean isValid = validateWallet.ValidateWallet(wallet);
-        if(isValid){
-            BigDecimal balance = amount.subtract(wallet.getBalance());
-            wallet.setBalance(balance);
-            walletRepository.save(wallet);
-        }
-
-        return  wallet;
-
-    }
-
-// ecrire la methode
-//         walletRepository.findById(id).orElseThrow(()-> new WalletNofoundException(id))
-    // pour retourner une exception si on ne trouve pas le id
-
-
-}
+// returne un ou un false wallet par son id

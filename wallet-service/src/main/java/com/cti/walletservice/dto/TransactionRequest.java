@@ -12,11 +12,11 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class TransactionRequest {
 
-    private String code;
-    private String reference;
-    private Date created;
-    private BigDecimal amount;
+    private BigDecimal amount = null;
+
+    private Long senderId = null;
+
+    private Long receiveId = null;
 }

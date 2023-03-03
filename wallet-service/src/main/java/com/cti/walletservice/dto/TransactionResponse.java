@@ -13,15 +13,22 @@ import java.util.Date;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class TransactionReponse {
+public class TransactionResponse {
 
     private Long id;
+
     private String code;
+
     private String reference;
-    private Boolean status;
+
     private Date created;
+
     private BigDecimal amount;
+
     private String message;
+
     private Long senderId;
+
     private Long receiveId;
+
 }

@@ -20,11 +20,6 @@ public class WalletController {
     @Autowired
     WalletService walletServices;
 
-    @Autowired
-    TransactionService transactionService;
-
-
-
     @PostMapping("/create")
     public ResponseEntity<WalletReponse>  createdwallet(@RequestBody WalletRequest walletRequest){
         return walletServices.createWallet (walletRequest);
@@ -44,7 +39,7 @@ public class WalletController {
 
     @GetMapping("/find/Id/{Id}")
     public ResponseEntity<WalletReponse> findById(@PathVariable Long Id){
-        return walletServices.findById(Id);
+        return walletServices.findWalletById(Id);
 
     }
 
@@ -59,44 +54,21 @@ public class WalletController {
         return walletServices.getAllWallets();
     }
 
-
-
-
-
-
-
-
-
-
-
-    @GetMapping("/find/id/{id}")
-    public Optional<Wallet> getWalletById(@PathVariable Long id){
-        System.out.println("getting wallet with id  %f" +id);
-        return walletServices.getWalletById(id);
-
-    }
-
     @GetMapping("/find/code/{walletCode}")
-    public Wallet getWalletByCode(@PathVariable String walletCode){
-        System.out.println("getting wallet by code %s" + walletCode);
-        return walletServices.getwalletByCode(walletCode);
-
+    public ResponseEntity<WalletReponse> getWalletByCode(@PathVariable String walletCode){
+        return walletServices.findWalletByCode(walletCode);
     }
-
 
 
     @PutMapping("/update")
-    public  Wallet updateWallet(@RequestBody WalletRequest walletRequest){
-        System.out.println("updating a wallet");
+    public  ResponseEntity<WalletReponse> updateWallet(@RequestBody WalletRequest walletRequest){
         return walletServices.updateWallet(walletRequest);
-
-
     }
 
-    @DeleteMapping("/delete/{id}")
-    public List<Wallet> deleteWalletByCode(@PathVariable Long id){
-        System.out.println("delete a wallet");
-        return walletServices.deleteWalletById(id);
+
+    @DeleteMapping("/delete/{code}")
+    public ResponseEntity<WalletReponse> deleteWalletByCode(@PathVariable String code){
+        return walletServices.deleteWalletByCode(code);
 
     }
 
